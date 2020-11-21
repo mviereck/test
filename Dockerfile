@@ -23,9 +23,11 @@ fi\n\
 
 
 RUN apt-get update && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install -y debootstrap curl && \
-    debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE rootfs http://packages.deepin.com/deepin/ && \
-    curl -fsSL http://mirrors.ustc.edu.cn/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb | dpkg -x - /rootfs  
+    env DEBIAN_FRONTEND=noninteractive apt-get install -y debootstrap curl
+RUN curl -fsSL http://mirrors.ustc.edu.cn/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /debian_keyring.deb
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y ./debian_keyring.deb
+RUN dpkg -x /debian_keyring.deb /rootfs  
+RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE rootfs http://packages.deepin.com/deepin/
 
 #Use the rootfs directory name based on the naming convention used by the Dockerfile here:
 # https://github.com/debuerreotype/docker-debian-artifacts/blob/794e462d2825fb1ebb3d54ff5c93dd401cf28b9a/stable/Dockerfile   
