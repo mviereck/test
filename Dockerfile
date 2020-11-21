@@ -1,6 +1,39 @@
+# x11docker/deepin
+# 
+# Run deepin desktop in a Docker container. 
+# Use x11docker to run image: 
+#   https://github.com/mviereck/x11docker 
+#
+# Run deepin desktop with:
+#   x11docker --desktop --init=systemd -- --cap-add=IPC_LOCK --security-opt seccomp=unconfined -- x11docker/deepin
+#
+# Run single application:
+#   x11docker x11docker/deepin deepin-terminal
+#
+# Options:
+
+# Persistent home folder stored on host with   --home
+# Share host file or folder with option        --share PATH
+# Hardware acceleration with option            --gpu
+# Clipboard sharing with option                --clipboard
+# Language locale setting with option          --lang [=$LANG]
+# Sound support with option                    --pulseaudio
+# Printer support with option                  --printer
+# Webcam support with option                   --webcam
+#
+# See x11docker --help for further options.
+
+#### stage 0: debian, debootstrap ####
 FROM debian:buster
+
+# Choose a deepin mirror close to your location.
+# Many further mirror listed at: https://www.deepin.org/en/mirrors/packages/
+#ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
+#ENV DEEPIN_MIRROR=http://mirrors.ustc.edu.cn/deepin/
+ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
+#ENV DEEPIN_MIRROR=http://ftp.fau.de/deepin/
+
 ENV DEEPIN_RELEASE=apricot
-#ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/games:/usr/games
 
 # debootstrap script
 RUN mkdir -p /usr/share/debootstrap/scripts && \
@@ -16,37 +49,19 @@ RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
         curl && \
-    curl -fsSL http://packages.deepin.com/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /deepin_keyring.deb && \
+    curl -fsSL https://packages.deepin.com/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /deepin_keyring.deb && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         ./deepin_keyring.deb && \
+    mkdir -p /rootfs && \
     dpkg -x /deepin_keyring.deb /rootfs && \
-    echo "$DEEPIN_RELEASE" > /rootfs/release
+    echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 
-RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE rootfs http://packages.deepin.com/deepin/
+RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_MIRROR
 
-################# 
+#### stage 1: deepin ####
 
 FROM scratch
 COPY --from=0 /rootfs /
-
-#RUN sed -i "s/mesg n/tty -s \&\& mesg n/" /root/.profile && \
-#    apt-get update && \
-#    apt --fix-broken -y install && \
-#    apt-get -y autoremove --purge && apt-get autoclean -y && \
-#    apt-get clean -y && \
-#    find /var/lib/apt/lists -type f -delete && \
-#    find /var/cache -type f -delete
-
-# Choose a mirror close to your location.
-# Many further mirror listed at:
-#   https://www.deepin.org/en/mirrors/packages/
-#ENV MIRROR=http://packages.deepin.com/deepin/
-#ENV MIRROR=http://mirrors.ustc.edu.cn/deepin/
-ENV MIRROR=http://mirrors.kernel.org/deepin/
-#ENV MIRROR=http://ftp.fau.de/deepin/
-
-# source list entry based on chosen mirror and release
-RUN echo "deb $MIRROR $(cat /release) main non-free contrib" > /etc/apt/sources.list
 
 # basics
 RUN rm -rf /var/lib/apt/lists/* && \
@@ -90,6 +105,8 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 # chinese fonts
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        xfonts-wqy fonts-wqy-microhei fonts-wqy-zenhei
+            xfonts-wqy \
+            fonts-wqy-microhei \
+            fonts-wqy-zenhei
 
 CMD ["startdde"]
