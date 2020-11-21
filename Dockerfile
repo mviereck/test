@@ -11,7 +11,7 @@ RUN mkdir -p /usr/share/debootstrap/scripts && \
 download_style apt\n\
 finddebs_style from-indices\n\
 variants - buildd fakechroot minbase\n\
-keyring /usr/share/keyrings/deepin-archive-keyring.gpg\n\
+keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
 if [ -e \"$DEBOOTSTRAP_DIR/scripts/debian-common\" ]; then\n\
  . \"$DEBOOTSTRAP_DIR/scripts/debian-common\"\n\
 elif [ -e /debootstrap/debian-common ]; then\n\
