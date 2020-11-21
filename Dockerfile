@@ -27,9 +27,9 @@ FROM debian:buster
 
 # Choose a deepin mirror close to your location.
 # Many further mirrors listed at: https://www.deepin.org/en/mirrors/packages/
-#ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
+ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
 #ENV DEEPIN_MIRROR=http://mirrors.ustc.edu.cn/deepin/
-ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
+#ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
 #ENV DEEPIN_MIRROR=http://ftp.fau.de/deepin/
 
 ENV DEEPIN_RELEASE=apricot
