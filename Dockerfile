@@ -6,7 +6,8 @@ ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local
 
 #COPY stable /usr/share/debootstrap/scripts/lion
 
-RUN echo "mirror_style release\n\
+RUN mkdir -p /usr/share/debootstrap/scripts && \
+    echo "mirror_style release\n\
 download_style apt\n\
 finddebs_style from-indices\n\
 variants - buildd fakechroot minbase\n\
