@@ -11,7 +11,6 @@
 #   x11docker x11docker/deepin deepin-terminal
 #
 # Options:
-
 # Persistent home folder stored on host with   --home
 # Share host file or folder with option        --share PATH
 # Hardware acceleration with option            --gpu
@@ -27,7 +26,7 @@
 FROM debian:buster
 
 # Choose a deepin mirror close to your location.
-# Many further mirror listed at: https://www.deepin.org/en/mirrors/packages/
+# Many further mirrors listed at: https://www.deepin.org/en/mirrors/packages/
 #ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
 #ENV DEEPIN_MIRROR=http://mirrors.ustc.edu.cn/deepin/
 ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
@@ -49,7 +48,8 @@ RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
         curl && \
-    curl -fsSL https://packages.deepin.com/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /deepin_keyring.deb && \
+    curl -fsSL $(echo "$DEEPIN_MIRROR" | sed "s/http:/https:/")/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb \
+         -o /deepin_keyring.deb && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         ./deepin_keyring.deb && \
     mkdir -p /rootfs && \
@@ -59,7 +59,6 @@ RUN apt-get update && \
 RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_MIRROR
 
 #### stage 1: deepin ####
-
 FROM scratch
 COPY --from=0 /rootfs /
 
@@ -105,8 +104,8 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 # chinese fonts
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            xfonts-wqy \
-            fonts-wqy-microhei \
-            fonts-wqy-zenhei
+        xfonts-wqy \
+        fonts-wqy-microhei \
+        fonts-wqy-zenhei
 
 CMD ["startdde"]
