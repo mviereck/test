@@ -1,6 +1,6 @@
 FROM debian:buster
 
-ENV DEEPIN_RELEASE=lion
+ENV DEEPIN_RELEASE=apricot
 
 ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/games:/usr/games
 
@@ -13,7 +13,7 @@ finddebs_style from-indices\n\
 variants - buildd fakechroot minbase\n\
 keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
 . /usr/share/debootstrap/scripts/debian-common \n\
-" > /usr/share/debootstrap/scripts/$DEEPIN_RELEASE
+" > /usr/share/debootstrap/scripts/deepin
 
 
 RUN apt-get update && \
@@ -21,7 +21,7 @@ RUN apt-get update && \
 RUN curl -fsSL http://packages.deepin.com/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /debian_keyring.deb
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y ./debian_keyring.deb
 RUN dpkg -x /debian_keyring.deb /rootfs  
-RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE rootfs http://packages.deepin.com/deepin/
+RUN debootstrap --variant=minbase --arch=amd64 deepin rootfs http://packages.deepin.com/deepin/
 
 #Use the rootfs directory name based on the naming convention used by the Dockerfile here:
 # https://github.com/debuerreotype/docker-debian-artifacts/blob/794e462d2825fb1ebb3d54ff5c93dd401cf28b9a/stable/Dockerfile   
