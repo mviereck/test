@@ -12,19 +12,13 @@ download_style apt\n\
 finddebs_style from-indices\n\
 variants - buildd fakechroot minbase\n\
 keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
-if [ -e \"$DEBOOTSTRAP_DIR/scripts/debian-common\" ]; then\n\
- . \"$DEBOOTSTRAP_DIR/scripts/debian-common\"\n\
-elif [ -e /debootstrap/debian-common ]; then\n\
- . /debootstrap/debian-common\n\
-else\n\
- error 1 NOCOMMON 'File not found: debian-common'\n\
-fi\n\
+. /usr/share/debootstrap/scripts/debian-common
 " > /usr/share/debootstrap/scripts/$DEEPIN_RELEASE
 
 
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y debootstrap curl
-RUN curl -fsSL http://mirrors.ustc.edu.cn/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /debian_keyring.deb
+RUN curl -fsSL http://packages.deepin.com/deepin/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb -o /debian_keyring.deb
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y ./debian_keyring.deb
 RUN dpkg -x /debian_keyring.deb /rootfs  
 RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE rootfs http://packages.deepin.com/deepin/
