@@ -80,6 +80,7 @@ RUN rm -rf /var/lib/apt/lists/* && \
         psmisc
 
 # deepin desktop
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends dde-session-ui
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         dde \
         at-spi2-core \
