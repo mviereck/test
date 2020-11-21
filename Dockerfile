@@ -1,10 +1,6 @@
 FROM debian:buster
-
 ENV DEEPIN_RELEASE=apricot
-
-ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/games:/usr/games
-
-#COPY stable /usr/share/debootstrap/scripts/lion
+#ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/games:/usr/games
 
 RUN mkdir -p /usr/share/debootstrap/scripts && \
     echo "mirror_style release\n\
@@ -22,11 +18,12 @@ RUN curl -fsSL http://packages.deepin.com/deepin/pool/main/d/deepin-keyring/deep
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y ./debian_keyring.deb
 RUN dpkg -x /debian_keyring.deb /rootfs  
 RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE rootfs http://packages.deepin.com/deepin/
+RUN mkdir -p /rootfs && \
+    echo "$DEEPIN_RELEASE" > /rootfs/release
 
-#Use the rootfs directory name based on the naming convention used by the Dockerfile here:
-# https://github.com/debuerreotype/docker-debian-artifacts/blob/794e462d2825fb1ebb3d54ff5c93dd401cf28b9a/stable/Dockerfile   
+################# 
+
 FROM scratch
-LABEL maintainer='Hongyi Zhao <hongyi.zhao@gmail.com>'
 COPY --from=0 /rootfs /
 
 RUN sed -i "s/mesg n/tty -s \&\& mesg n/" /root/.profile && \
@@ -37,7 +34,7 @@ RUN sed -i "s/mesg n/tty -s \&\& mesg n/" /root/.profile && \
     find /var/cache -type f -delete
 
 # choose a mirror
-RUN echo "deb http://packages.deepin.com/deepin/ $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list
+RUN echo "deb http://packages.deepin.com/deepin/ $(cat /release) main non-free contrib" > /etc/apt/sources.list
 
 # basics
 RUN rm -rf /var/lib/apt/lists/* && \
