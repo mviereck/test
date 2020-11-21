@@ -12,7 +12,7 @@ download_style apt\n\
 finddebs_style from-indices\n\
 variants - buildd fakechroot minbase\n\
 keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
-. /usr/share/debootstrap/scripts/debian-common
+. /usr/share/debootstrap/scripts/debian-common \n\
 " > /usr/share/debootstrap/scripts/$DEEPIN_RELEASE
 
 
