@@ -88,8 +88,8 @@ RUN rm -rf /var/lib/apt/lists/* && \
         psmisc
 
 # deepin desktop
-RUN dpkg -l | grep ^..r
-RUN dpkg --get-selections | grep hold
+RUN dpkg -l | grep ^..r ||:
+RUN dpkg --get-selections | grep hold ||:
 RUN apt-get install -y deepin-keyring aptitude
 RUN apt-mark showhold
 #RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --fix-broken --fix-missing \
