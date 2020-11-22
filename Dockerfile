@@ -91,7 +91,9 @@ RUN rm -rf /var/lib/apt/lists/* && \
 RUN dpkg -l | grep ^..r ||:
 RUN dpkg --get-selections | grep hold ||:
 RUN apt-get install -y deepin-keyring aptitude
-RUN apt-mark showhold
+RUN apt-get remove -y qt5dxcb-plugin
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        dde-qt5xcb-plugin pbis-open ukui-greeter
 #RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --fix-broken --fix-missing \
 RUN aptitude install \
         dde \
