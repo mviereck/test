@@ -27,9 +27,9 @@ FROM debian:buster
 
 # Choose a deepin mirror close to your location.
 # Many further mirrors listed at: https://www.deepin.org/en/mirrors/packages/
-ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
+#ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
 #ENV DEEPIN_MIRROR=http://mirrors.ustc.edu.cn/deepin/
-#ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
+ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
 #ENV DEEPIN_MIRROR=http://ftp.fau.de/deepin/
 
 ENV DEEPIN_RELEASE=apricot
@@ -48,7 +48,7 @@ RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
         curl && \
-    curl -fsSL $(echo "$DEEPIN_MIRROR" | sed "s/http:/https:/")/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb \
+    curl -fsSL $DEEPIN_MIRROR/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb \
          -o /deepin_keyring.deb && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         ./deepin_keyring.deb && \
@@ -61,6 +61,8 @@ RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_M
 #### stage 1: deepin ####
 FROM scratch
 COPY --from=0 /rootfs /
+
+ENV SHELL=/bin/bash
 
 # basics
 RUN rm -rf /var/lib/apt/lists/* && \
@@ -80,7 +82,6 @@ RUN rm -rf /var/lib/apt/lists/* && \
         psmisc
 
 # deepin desktop
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends dde-session-ui
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         dde \
         at-spi2-core \
