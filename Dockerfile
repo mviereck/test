@@ -47,7 +47,7 @@ keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
-        curl 
+        curl \
         gnupg && \
     mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
