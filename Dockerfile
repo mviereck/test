@@ -117,7 +117,6 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         deepin-image-viewer \
         deepin-movie \
         deepin-music \
-        deepin-screen-recorder \
         deepin-screenshot \
         deepin-system-monitor \
         deepin-terminal \
