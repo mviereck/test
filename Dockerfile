@@ -47,13 +47,19 @@ keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
-        curl && \
-    curl -fsSL $DEEPIN_MIRROR/pool/main/d/deepin-keyring/deepin-keyring_2020.03.13-1_all.deb \
-         -o /deepin_keyring.deb && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        ./deepin_keyring.deb && \
+        curl 
+        gnupg && \
+    mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
+    echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
+    apt-get update && \
+    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        deepin-keyring && \
+    apt-get download deepin-keyring && \
+    ls /* && \
+    rm /etc/apt/sources.list && \
+    mv /etc/apt/sources.list.debian /etc/apt/sources.list && \
     mkdir -p /rootfs && \
-    dpkg -x /deepin_keyring.deb /rootfs && \
+    dpkg -x /deepin-keyring* /rootfs && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 
 RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_MIRROR
