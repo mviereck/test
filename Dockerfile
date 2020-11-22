@@ -49,6 +49,7 @@ RUN apt-get update && \
         debootstrap \
         curl \
         gnupg && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys　425956BB3E31DF51 \
     mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
     apt-get update && \
