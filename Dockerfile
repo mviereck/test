@@ -34,16 +34,7 @@ ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
 
 ENV DEEPIN_RELEASE=apricot
 
-# debootstrap script
-RUN mkdir -p /usr/share/debootstrap/scripts && \
-    echo "mirror_style release\n\
-download_style apt\n\
-finddebs_style from-indices\n\
-variants - buildd fakechroot minbase\n\
-keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
-. /usr/share/debootstrap/scripts/debian-common \n\
-" > /usr/share/debootstrap/scripts/$DEEPIN_RELEASE
-
+# prepare sources and keys
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
@@ -60,28 +51,39 @@ RUN apt-get update && \
     dpkg -x /deepin-keyring* /rootfs && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 
-RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_MIRROR
+# debootstrap script
+RUN mkdir -p /usr/share/debootstrap/scripts && \
+    echo "mirror_style release\n\
+download_style apt\n\
+finddebs_style from-indices\n\
+variants - buildd fakechroot minbase\n\
+keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
+. /usr/share/debootstrap/scripts/debian-common \n\
+" > /usr/share/debootstrap/scripts/$DEEPIN_RELEASE
+
+RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_MIRROR && \
+    chroot ./rootfs apt-get update && \
+    chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get remove -y adwaita-icon-theme && \
+    chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
+    chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+    chroot ./rootfs apt-get clean && \
+    chroot ./rootfs find /var/lib/apt/lists -type f -delete && \
+    chroot ./rootfs find /var/cache -type f -delete && \
+    chroot ./rootfs find /var/log -type f -delete
 
 #### stage 1: deepin ####
 FROM scratch
 COPY --from=0 /rootfs /
 
 ENV SHELL=/bin/bash
-ENV LANG=en_US.utf8
+ENV LANG=en_US.UTF-8
 
 # basics
-RUN rm -rf /var/lib/apt/lists/* && \
-    apt-get clean && \
-    apt-get update && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install --fix-broken -y && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -y && \
-    env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
-    apt-get -y autoremove && \
-    apt-get clean && \
+RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         apt-transport-https \
-        deepin-keyring \
         dbus-x11 \
+        deepin-keyring \
         gnupg \
         libcups2 \
         libpulse0 \
@@ -92,11 +94,11 @@ RUN rm -rf /var/lib/apt/lists/* && \
         procps \
         psmisc && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    find /var/lib/apt/lists -type f -delete
 
 # deepin desktop
 
-# Dependencies of 'apt-get show dde'
+# Dependencies taken from 'apt-get show dde'
 # (excluded: dde-session-ui deepin-manual eject plymouth-theme-deepin-logo dde-printer deepin-screensaver)
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -115,7 +117,7 @@ RUN apt-get update && \
         fonts-noto \
         startdde && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    find /var/lib/apt/lists -type f -delete
 
 # once needed to add, obsolete now?
 #RUN apt-get update && \
@@ -126,7 +128,7 @@ RUN apt-get update && \
 #        gtk2-engines-pixbuf \
 #        pciutils && \
 #    apt-get clean && \
-#    rm -rf /var/lib/apt/lists/*
+#    find /var/lib/apt/lists -type f -delete
 
 
 # additional applications
@@ -147,7 +149,7 @@ RUN apt-get update && \
         oneko \
         sudo && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    find /var/lib/apt/lists -type f -delete
 
 
 # chinese fonts and input methods
@@ -159,6 +161,6 @@ RUN apt-get update && \
 #        fonts-wqy-microhei \
 #        fonts-wqy-zenhei && \
 #    apt-get clean && \
-#    rm -rf /var/lib/apt/lists/*
+#    find /var/lib/apt/lists -type f -delete
 
 CMD ["startdde"]
