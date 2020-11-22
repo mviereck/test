@@ -73,6 +73,7 @@ RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \
     apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install --fix-broken -y && \
+    env DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -y && \
     env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
     apt-get -y autoremove && \
     apt-get clean && \
@@ -87,7 +88,12 @@ RUN rm -rf /var/lib/apt/lists/* && \
         psmisc
 
 # deepin desktop
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --fix-broken --fix-missing \
+RUN dpkg -l | grep ^..r
+RUN dpkg --get-selections | grep hold
+RUN apt-get install -y deepin-keyring aptitude
+RUN apt-mark showhold
+#RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --fix-broken --fix-missing \
+RUN aptitude install \
         dde \
         at-spi2-core \
         gnome-themes-standard \
