@@ -91,9 +91,11 @@ RUN rm -rf /var/lib/apt/lists/* && \
 RUN dpkg -l | grep ^..r ||:
 RUN dpkg --get-selections | grep hold ||:
 RUN apt-get install -y deepin-keyring aptitude
-RUN apt-get remove -y qt5dxcb-plugin
+RUN apt-get install -y curl && \
+    curl -fsSL http://mirrors.kernel.org/deepin/pool/non-free/p/pbis-open/pbis-open_8.5.7.385.2_amd64.deb -o /pbis-open.deb && \
+    dpkg -i /pbis-open.deb
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        dde-qt5xcb-plugin pbis-open ukui-greeter
+        dde-qt5xcb-plugin ukui-greeter
 #RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --fix-broken --fix-missing \
 RUN aptitude install \
         dde \
