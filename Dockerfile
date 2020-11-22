@@ -5,7 +5,7 @@
 #   https://github.com/mviereck/x11docker 
 #
 # Run deepin desktop with:
-#   x11docker --desktop --init=systemd -- --cap-add=IPC_LOCK --security-opt seccomp=unconfined -- x11docker/deepin
+#   x11docker --desktop --init=systemd --cap-default -- x11docker/deepin
 #
 # Run single application:
 #   x11docker x11docker/deepin deepin-terminal
@@ -78,8 +78,11 @@ RUN rm -rf /var/lib/apt/lists/* && \
     apt-get -y autoremove && \
     apt-get clean && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        gnupg \
+        deepin-keyring \
         dbus-x11 \
+        gnupg \
+        libcups2 \
+        libpulse0 \
         libxv1 \
         locales-all \
         mesa-utils \
@@ -89,29 +92,15 @@ RUN rm -rf /var/lib/apt/lists/* && \
 
 # deepin desktop
 
-# workaround to fix dependency pbis-open
-#RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-#        aptitude \
-#        curl && \
-#    curl -fsSL http://mirrors.kernel.org/deepin/pool/non-free/p/pbis-open/pbis-open_8.5.7.385.2_amd64.deb -o /pbis-open.deb && \
-#    curl -fsSL http://mirrors.kernel.org/deepin/pool/non-free/p/pbis-open-upgrade/pbis-open-upgrade_8.5.7.385_amd64.deb -o /pbis-open-#upgrade.deb && \
-#    dpkg -i /pbis-open-upgrade.deb /pbis-open.deb
-
-
-# dde-session-ui eject plymouth-theme-deepin-logo deepin-screensaver
+# Dependencies of 'apt-get show dde'
+# (excluded: dde-session-ui deepin-manual eject plymouth-theme-deepin-logo dde-printer deepin-screensaver)
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         deepin-desktop-base deepin-default-settings dde-desktop dde-dock dde-launcher dde-control-center \
-        startdde deepin-artwork deepin-manual dde-file-manager dde-qt5integration deepin-wallpapers \
-        fonts-noto dde-kwin dde-clipboard dde-printer
+        startdde deepin-artwork dde-file-manager dde-qt5integration deepin-wallpapers \
+        fonts-noto dde-kwin dde-clipboard
 
-#Recommends: deepin-devicemanager, deepin-boot-maker, deepin-reader, deepin-log-viewer, dde-introduction, deepin-app-store, deepin-editor, deepin-system-monitor, pppoe, gvfs-fuse, smbclient, python-smbc, cups-filters, printer-driver-all, foomatic-db-compressed-ppds, foomatic-db-engine, openprinting-ppds, libsane-hpaio, linux-firmware, wireless-tools, ttf-deepin-opensymbol, deepin-terminal | gnome-terminal, printer-driver-hpcups, printer-driver-hpijs, libmtp-runtime, samsung-print, open-vm-tools-desktop, open-vm-tools, usbmuxd, ipheth-utils, libimobiledevice-dev, libimobiledevice-utils, dnsutils, libfile-mimeinfo-perl, deepin-shortcut-viewer, crda, network-manager-integration-plugins, libtxc-dxtn-s2tc0 | libtxc-dxtn-s2tc, libflashplugin-pepper, x-display-manager, deepin-music, deepin-image-viewer, dde-calendar, deepin-calculator, deepin-voice-note, deepin-screen-recorder, deepin-font-manager, deepin-draw, deepin-album, deepin-movie, deepin-deb-installer, deepin-compressor, fcitx-sunpinyin, fcitx-ui-classic
-
-
-#RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends dde-qt5xcb-plugin ukui-greeter
+# once needed to add, obsolete now?
 #RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-#RUN aptitude install -f -y -R \
-#        dde \
-#        deepin-keyring \
 #        at-spi2-core \
 #        gnome-themes-standard \
 #        gtk2-engines-murrine \
@@ -120,20 +109,27 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommend
 
 # additional applications
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        dde-calendar \
+        deepin-album \
         deepin-calculator \
+        deepin-draw \
+        deepin-editor \
         deepin-image-viewer \
+        deepin-movie \
+        deepin-music \
+        deepin-screen-recorder \
         deepin-screenshot \
         deepin-system-monitor \
         deepin-terminal \
-        deepin-movie \
-        gedit \
+        deepin-voice-note \
         oneko \
         sudo \
-        synaptic \
         apt-transport-https
 
-# chinese fonts
+# chinese fonts and input methods
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        fcitx-sunpinyin \
+        fcitx-ui-classic \
         xfonts-wqy \
         fonts-wqy-microhei \
         fonts-wqy-zenhei
