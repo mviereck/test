@@ -51,6 +51,13 @@ RUN apt-get update && \
     dpkg -x /deepin-keyring* /rootfs && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 
+RUN echo "#! /bin/sh\n\
+apt-get clean\n\
+find /var/lib/apt/lists -type f -delete\n\
+find /var/cache -type f -delete\n\
+find /var/log -type f -delete\n\
+" > /roots/cleanup && chmod +x /rootfs/cleanup
+
 # debootstrap script
 RUN mkdir -p /usr/share/debootstrap/scripts && \
     echo "mirror_style release\n\
@@ -66,10 +73,7 @@ RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_M
     chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get remove -y adwaita-icon-theme && \
     chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
     chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
-    chroot ./rootfs apt-get clean && \
-    chroot ./rootfs find /var/lib/apt/lists -type f -delete && \
-    chroot ./rootfs find /var/cache -type f -delete && \
-    chroot ./rootfs find /var/log -type f -delete
+    chroot ./rootfs /cleanup
 
 #### stage 1: deepin ####
 FROM scratch
@@ -93,8 +97,7 @@ RUN apt-get update && \
         mesa-utils-extra \
         procps \
         psmisc && \
-    apt-get clean && \
-    find /var/lib/apt/lists -type f -delete
+    /cleanup
 
 # deepin desktop
 
@@ -116,8 +119,7 @@ RUN apt-get update && \
         deepin-wallpapers \
         fonts-noto \
         startdde && \
-    apt-get clean && \
-    find /var/lib/apt/lists -type f -delete
+    /cleanup
 
 # once needed to add, obsolete now?
 #RUN apt-get update && \
@@ -127,9 +129,7 @@ RUN apt-get update && \
 #        gtk2-engines-murrine \
 #        gtk2-engines-pixbuf \
 #        pciutils && \
-#    apt-get clean && \
-#    find /var/lib/apt/lists -type f -delete
-
+#    /cleanup
 
 # additional applications
 RUN apt-get update && \
@@ -148,9 +148,7 @@ RUN apt-get update && \
         deepin-voice-note \
         oneko \
         sudo && \
-    apt-get clean && \
-    find /var/lib/apt/lists -type f -delete
-
+    /cleanup
 
 # chinese fonts and input methods
 #RUN apt-get update && \
@@ -160,7 +158,6 @@ RUN apt-get update && \
 #        xfonts-wqy \
 #        fonts-wqy-microhei \
 #        fonts-wqy-zenhei && \
-#    apt-get clean && \
-#    find /var/lib/apt/lists -type f -delete
+#    /cleanup
 
 CMD ["startdde"]
