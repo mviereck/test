@@ -67,6 +67,7 @@ FROM scratch
 COPY --from=0 /rootfs /
 
 ENV SHELL=/bin/bash
+ENV LANG=en_US.utf8
 
 # basics
 RUN rm -rf /var/lib/apt/lists/* && \
@@ -89,27 +90,48 @@ RUN rm -rf /var/lib/apt/lists/* && \
         mesa-utils \
         mesa-utils-extra \
         procps \
-        psmisc
+        psmisc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # deepin desktop
 
 # Dependencies of 'apt-get show dde'
 # (excluded: dde-session-ui deepin-manual eject plymouth-theme-deepin-logo dde-printer deepin-screensaver)
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        deepin-desktop-base deepin-default-settings dde-desktop dde-dock dde-launcher dde-control-center \
-        startdde deepin-artwork dde-file-manager dde-qt5integration deepin-wallpapers \
-        fonts-noto dde-kwin dde-clipboard
+RUN apt-get update && \
+    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        dde-control-center \
+        dde-clipboard \
+        dde-desktop \
+        dde-dock \
+        dde-file-manager \
+        dde-kwin \
+        dde-launcher \
+        dde-qt5integration \
+        deepin-artwork \
+        deepin-default-settings \
+        deepin-desktop-base \
+        deepin-wallpapers \
+        fonts-noto \
+        startdde && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # once needed to add, obsolete now?
-#RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+#RUN apt-get update && \
+#    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 #        at-spi2-core \
 #        gnome-themes-standard \
 #        gtk2-engines-murrine \
 #        gtk2-engines-pixbuf \
-#        pciutils
+#        pciutils && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
+
 
 # additional applications
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         dde-calendar \
         deepin-album \
         deepin-calculator \
@@ -123,14 +145,20 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommend
         deepin-terminal \
         deepin-voice-note \
         oneko \
-        sudo
+        sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 
 # chinese fonts and input methods
-#RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+#RUN apt-get update && \
+#    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 #        fcitx-sunpinyin \
 #        fcitx-ui-classic \
 #        xfonts-wqy \
 #        fonts-wqy-microhei \
-#        fonts-wqy-zenhei
+#        fonts-wqy-zenhei && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
 
 CMD ["startdde"]
