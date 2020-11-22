@@ -77,7 +77,8 @@ RUN rm -rf /var/lib/apt/lists/* && \
     env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
     apt-get -y autoremove && \
     apt-get clean && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        apt-transport-https \
         deepin-keyring \
         dbus-x11 \
         gnupg \
@@ -108,7 +109,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommend
 #        pciutils
 
 # additional applications
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         dde-calendar \
         deepin-album \
         deepin-calculator \
@@ -122,15 +123,14 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         deepin-terminal \
         deepin-voice-note \
         oneko \
-        sudo \
-        apt-transport-https
+        sudo
 
 # chinese fonts and input methods
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        fcitx-sunpinyin \
-        fcitx-ui-classic \
-        xfonts-wqy \
-        fonts-wqy-microhei \
-        fonts-wqy-zenhei
+#RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+#        fcitx-sunpinyin \
+#        fcitx-ui-classic \
+#        xfonts-wqy \
+#        fonts-wqy-microhei \
+#        fonts-wqy-zenhei
 
 CMD ["startdde"]
