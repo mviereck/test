@@ -75,6 +75,7 @@ ENV SHELL=/bin/bash
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \
     apt-get update && \
+    env DEBIAN_FRONTEND=noninteractive apt-get install --fix-broken -y && \
     env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
     apt-get -y autoremove && \
     apt-get clean && \
