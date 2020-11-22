@@ -47,16 +47,13 @@ keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
-        curl \
         gnupg && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 425956BB3E31DF51 && \
     mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
     apt-get update && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        deepin-keyring && \
     apt-get download deepin-keyring && \
-    ls /* && \
+    dpkg -i /deepin-keyring* && \
     rm /etc/apt/sources.list && \
     mv /etc/apt/sources.list.debian /etc/apt/sources.list && \
     mkdir -p /rootfs && \
@@ -90,7 +87,7 @@ RUN rm -rf /var/lib/apt/lists/* && \
         psmisc
 
 # deepin desktop
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --fix-broken --fix-missing \
         dde \
         at-spi2-core \
         gnome-themes-standard \
