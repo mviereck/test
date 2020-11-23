@@ -39,19 +39,19 @@ RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
         gnupg && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 425956BB3E31DF51 && \
-    mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
-    echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get download deepin-keyring && \
-    find /var/lib/apt/lists -type f -delete && \
-    rm /etc/apt/sources.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 425956BB3E31DF51 #&& \
+#    mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
+#    echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
+#    apt-get update && \
+#    apt-get download deepin-keyring && \
+#    find /var/lib/apt/lists -type f -delete && \
+#    rm /etc/apt/sources.list && \
     mv /etc/apt/sources.list.debian /etc/apt/sources.list && \
-    mkdir -p /rootfs && \
-    dpkg -x /deepin-keyring* /rootfs && \
+    
+RUN    mkdir -p /rootfs && \
+    cp /etc/apt/trusted.gpg /rootfs/etc/apt/trusted.gpg && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
-
-    #    dpkg -i /deepin-keyring* && \
+#    dpkg -x /deepin-keyring* /rootfs && \
 
 # cleanup script for use after apt-get
 RUN echo '#! /bin/sh\n\
