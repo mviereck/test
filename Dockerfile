@@ -53,7 +53,7 @@ RUN apt-get update && \
 
 # cleanup script for use after apt-get
 RUN echo "#! /bin/sh\n\
-env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y
+env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y\n\
 apt-get clean\n\
 find /var/lib/apt/lists -type f -delete\n\
 find /var/cache -type f -delete\n\
