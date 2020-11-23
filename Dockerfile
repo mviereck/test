@@ -51,12 +51,14 @@ RUN apt-get update && \
     dpkg -x /deepin-keyring* /rootfs && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 
+# cleanup script for use after apt-get
 RUN echo "#! /bin/sh\n\
+env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y
 apt-get clean\n\
 find /var/lib/apt/lists -type f -delete\n\
 find /var/cache -type f -delete\n\
 find /var/log -type f -delete\n\
-" > /roots/cleanup && chmod +x /rootfs/cleanup
+" > /rootfs/cleanup && chmod +x /rootfs/cleanup
 
 # debootstrap script
 RUN mkdir -p /usr/share/debootstrap/scripts && \
@@ -70,9 +72,7 @@ keyring /usr/share/keyrings/deepin-archive-camel-keyring.gpg\n\
 
 RUN debootstrap --variant=minbase --arch=amd64 $DEEPIN_RELEASE /rootfs $DEEPIN_MIRROR && \
     chroot ./rootfs apt-get update && \
-    chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get remove -y adwaita-icon-theme && \
     chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
-    chroot ./rootfs env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
     chroot ./rootfs /cleanup
 
 #### stage 1: deepin ####
