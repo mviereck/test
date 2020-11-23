@@ -48,7 +48,7 @@ RUN apt-get update && \
 #    rm /etc/apt/sources.list && \
     mv /etc/apt/sources.list.debian /etc/apt/sources.list && \
     
-RUN    mkdir -p /rootfs && \
+RUN    mkdir -p /rootfs/etc/apt && \
     cp /etc/apt/trusted.gpg /rootfs/etc/apt/trusted.gpg && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 #    dpkg -x /deepin-keyring* /rootfs && \
