@@ -26,7 +26,7 @@
 FROM debian:buster
 
 # Choose a deepin mirror close to your location.
-# Many further mirrors listed at: https://www.deepin.org/en/mirrors/packages/
+# Many further mirrors are listed at: https://www.deepin.org/en/mirrors/packages/
 #ENV DEEPIN_MIRROR=http://packages.deepin.com/deepin/
 #ENV DEEPIN_MIRROR=http://mirrors.ustc.edu.cn/deepin/
 ENV DEEPIN_MIRROR=http://mirrors.kernel.org/deepin/
@@ -39,20 +39,10 @@ RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         debootstrap \
         gnupg && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 425956BB3E31DF51 
-    #&& \
-#    mv /etc/apt/sources.list /etc/apt/sources.list.debian && \
-#    echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
-#    apt-get update && \
-#    apt-get download deepin-keyring && \
-#    find /var/lib/apt/lists -type f -delete && \
-#    rm /etc/apt/sources.list && \
-#    mv /etc/apt/sources.list.debian /etc/apt/sources.list && \
-    
-RUN    mkdir -p /rootfs/etc/apt && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 425956BB3E31DF51 && \
+    mkdir -p /rootfs/etc/apt && \
     cp /etc/apt/trusted.gpg /rootfs/etc/apt/trusted.gpg && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
-#    dpkg -x /deepin-keyring* /rootfs && \
 
 # cleanup script for use after apt-get
 RUN echo '#! /bin/sh\n\
