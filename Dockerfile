@@ -5,7 +5,7 @@
 #   https://github.com/mviereck/x11docker 
 #
 # Run deepin desktop with:
-#   x11docker --desktop --init=systemd --cap-default -- x11docker/deepin
+#   x11docker --desktop --init=systemd -- --cap-add=IPC_LOCK -- x11docker/deepin
 #
 # Run single application:
 #   x11docker x11docker/deepin deepin-terminal
@@ -44,21 +44,24 @@ RUN apt-get update && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /etc/apt/sources.list && \
     apt-get update && \
     apt-get download deepin-keyring && \
-    dpkg -i /deepin-keyring* && \
+    find /var/lib/apt/lists -type f -delete && \
     rm /etc/apt/sources.list && \
     mv /etc/apt/sources.list.debian /etc/apt/sources.list && \
     mkdir -p /rootfs && \
     dpkg -x /deepin-keyring* /rootfs && \
     echo "deb $DEEPIN_MIRROR $DEEPIN_RELEASE main non-free contrib" > /rootfs/etc/apt/sources.list
 
+    #    dpkg -i /deepin-keyring* && \
+
 # cleanup script for use after apt-get
-RUN echo "#! /bin/sh\n\
+RUN echo '#! /bin/sh\n\
 env DEBIAN_FRONTEND=noninteractive apt-get autoremove -y\n\
 apt-get clean\n\
 find /var/lib/apt/lists -type f -delete\n\
 find /var/cache -type f -delete\n\
 find /var/log -type f -delete\n\
-" > /rootfs/cleanup && chmod +x /rootfs/cleanup
+exit 0\n\
+' > /rootfs/cleanup && chmod +x /rootfs/cleanup
 
 # debootstrap script
 RUN mkdir -p /usr/share/debootstrap/scripts && \
@@ -96,7 +99,8 @@ RUN apt-get update && \
         mesa-utils \
         mesa-utils-extra \
         procps \
-        psmisc && \
+        psmisc \
+        x11-xkb-utils && \
     /cleanup
 
 # deepin desktop
@@ -120,16 +124,6 @@ RUN apt-get update && \
         fonts-noto \
         startdde && \
     /cleanup
-
-# once needed to add, obsolete now?
-#RUN apt-get update && \
-#    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-#        at-spi2-core \
-#        gnome-themes-standard \
-#        gtk2-engines-murrine \
-#        gtk2-engines-pixbuf \
-#        pciutils && \
-#    /cleanup
 
 # additional applications
 RUN apt-get update && \
