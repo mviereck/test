@@ -80,6 +80,7 @@ ENV LANG=en_US.UTF-8
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         apt-transport-https \
+        ca-certificates \
         dbus-x11 \
         deepin-keyring \
         gnupg \
@@ -91,13 +92,17 @@ RUN apt-get update && \
         mesa-utils-extra \
         procps \
         psmisc \
+        sudo \
+        xdg-user-dirs \
+        xdg-utils \
         x11-xkb-utils && \
     /cleanup
 
 # deepin desktop
 
-# Dependencies taken from 'apt-get show dde'
+# Dependencies taken from 'apt show dde'
 # (excluded: dde-session-ui deepin-manual eject plymouth-theme-deepin-logo dde-printer deepin-screensaver)
+# (added: deepin-terminal)
 RUN apt-get update && \
     env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         dde-control-center \
@@ -111,38 +116,27 @@ RUN apt-get update && \
         deepin-artwork \
         deepin-default-settings \
         deepin-desktop-base \
+        deepin-terminal \
         deepin-wallpapers \
         fonts-noto \
         startdde && \
     /cleanup
 
 # additional applications
-RUN apt-get update && \
-    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        dde-calendar \
-        deepin-album \
-        deepin-calculator \
-        deepin-draw \
-        deepin-editor \
-        deepin-image-viewer \
-        deepin-movie \
-        deepin-music \
-        deepin-screenshot \
-        deepin-system-monitor \
-        deepin-terminal \
-        deepin-voice-note \
-        oneko \
-        sudo && \
-    /cleanup
-
-# chinese fonts and input methods
 #RUN apt-get update && \
 #    env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-#        fcitx-sunpinyin \
-#        fcitx-ui-classic \
-#        xfonts-wqy \
-#        fonts-wqy-microhei \
-#        fonts-wqy-zenhei && \
+#        dde-calendar \
+#        deepin-album \
+#        deepin-calculator \
+#        deepin-draw \
+#        deepin-editor \
+#        deepin-image-viewer \
+#        deepin-movie \
+#        deepin-music \
+#        deepin-screenshot \
+#        deepin-system-monitor \
+#        deepin-voice-note && \
+#        oneko \
 #    /cleanup
 
 CMD ["startdde"]
